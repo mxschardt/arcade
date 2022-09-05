@@ -1,3 +1,4 @@
+use core::fmt;
 use rand::Rng;
 use std::collections::HashSet;
 
@@ -20,7 +21,7 @@ pub enum RevealResult {
 impl Minesweeper {
     pub fn new(width: usize, height: usize, mine_count: usize) -> Minesweeper {
         Minesweeper {
-            width, // 0..width
+            width,
             height,
             mines: {
                 let mut mines = HashSet::new();
@@ -76,6 +77,32 @@ impl Minesweeper {
             self.flagged_cells.remove(&p);
         };
     }
+
+    fn format_cell(&self, p: Position) -> String {
+        if self.open_cells.contains(&p) {
+            if self.mines.contains(&p) {
+                format!("*")
+            } else {
+                format!("{}", self.count_mines(p))
+            }
+        } else if self.flagged_cells.contains(&p) {
+            format!("f")
+        } else {
+            format!("#")
+        }
+    }
+}
+
+impl fmt::Display for Minesweeper {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        for i in 0..self.height {
+            for j in 0..self.width {
+                write!(f, " {} ", self.format_cell((i, j)))?;
+            }
+            writeln!(f)?;
+        }
+        writeln!(f)
+    }
 }
 
 #[cfg(test)]
@@ -84,10 +111,21 @@ mod tests {
 
     #[test]
     fn setup() {
+        let ms = Minesweeper::new(4, 4, 5);
+        println!("{}", ms);
+        println!("{:?}", ms);
+    }
+
+    #[test]
+    fn test_open_and_flag() {
         let mut ms = Minesweeper::new(4, 4, 5);
         for i in 0..ms.height {
             for j in 0..ms.width {
-                ms.reveal_cell((i, j));
+                if i < 2 {
+                    ms.reveal_cell((i, j));
+                } else {
+                    ms.flag_cell((i, j));
+                }
             }
         }
         println!("{}", ms);
@@ -110,7 +148,7 @@ mod tests {
         let mut full_ms = Minesweeper::new(2, 2, 9);
         match full_ms.reveal_cell((1, 1)) {
             RevealResult::Mine => {}
-            RevealResult::MineCount(c) => {
+            RevealResult::MineCount(_c) => {
                 panic!("The Minefield is not full!");
             }
         }
