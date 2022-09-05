@@ -70,6 +70,12 @@ impl Minesweeper {
             }
         })
     }
+
+    fn flag_cell(&mut self, p: Position) {
+        if !self.flagged_cells.insert(p) {
+            self.flagged_cells.remove(&p);
+        };
+    }
 }
 
 #[cfg(test)]
@@ -77,7 +83,7 @@ mod tests {
     use crate::{Minesweeper, RevealResult};
 
     #[test]
-    fn test() {
+    fn setup() {
         let ms = Minesweeper::new(10, 10, 5);
 
         println!("{:?}", ms);
@@ -95,5 +101,15 @@ mod tests {
                 panic!("The Minefield is not full!");
             }
         }
+    }
+
+    #[test]
+    fn test_flags() {
+        let mut ms = Minesweeper::new(10, 10, 0);
+
+        ms.flag_cell((1, 1));
+        assert_eq!(ms.flagged_cells.len(), 1);
+        ms.flag_cell((1, 1));
+        assert_eq!(ms.flagged_cells.len(), 0);
     }
 }
