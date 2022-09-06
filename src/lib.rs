@@ -53,12 +53,12 @@ impl Minesweeper {
 
     fn get_neighbors_pos(&self, (x, y): Position) -> impl Iterator<Item = Position> {
         let x_min = if x > 0 { x - 1 } else { x };
-        let x_max = if x >= self.width { x } else { x + 2 };
+        let x_max = if x >= self.width - 1 { x } else { x + 1 };
         let y_min = if y > 0 { y - 1 } else { y };
-        let y_max = if y >= self.height { y } else { y + 2 };
+        let y_max = if y >= self.height - 1 { y } else { y + 1 };
 
-        (x_min..x_max)
-            .flat_map(move |i| (y_min..y_max).map(move |j| (i, j)))
+        (x_min..=x_max)
+            .flat_map(move |i| (y_min..=y_max).map(move |j| (i, j)))
             .filter(move |&pos| pos != (x, y))
     }
     // Only non-mines positions expected
@@ -134,9 +134,10 @@ mod tests {
 
     #[test]
     fn test_neighbour_pos() {
-        let ms = Minesweeper::new(2, 2, 0);
-
+        let ms = Minesweeper::new(3, 3, 0);
+        
         assert_eq!(3, ms.get_neighbors_pos((0, 0)).count());
+        assert_eq!(3, ms.get_neighbors_pos((2, 2)).count());
         assert_eq!(5, ms.get_neighbors_pos((0, 1)).count());
         assert_eq!(8, ms.get_neighbors_pos((1, 1)).count());
     }
