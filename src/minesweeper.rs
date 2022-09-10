@@ -4,6 +4,7 @@ use std::collections::HashSet;
 
 use wasm_bindgen::prelude::*;
 
+// TODO: Reduce size to 1 byte
 #[wasm_bindgen]
 #[derive(Debug)]
 pub struct Cell {
@@ -168,7 +169,7 @@ impl fmt::Display for Minesweeper {
 
 #[cfg(test)]
 mod tests {
-    use crate::minesweeper::{ Minesweeper, Cell, CellValue };
+    use crate::minesweeper::{Cell, CellValue, Minesweeper};
     use std::mem::size_of;
 
     #[test]
@@ -198,20 +199,22 @@ mod tests {
         for _ in 0..99 {
             let ms = Minesweeper::new(20, 20, 20);
             let ms_empty = Minesweeper::new(20, 20, 0);
-            
-            assert_eq!(ms.cells.iter().filter(|cell| cell.value == CellValue::Mine).count(), 20);
-            assert_eq!(ms_empty.cells.iter().filter(|cell| cell.value == CellValue::Mine).count(), 0);
-        }
-    }
 
-    #[test]
-    fn memory_test() {
-        let ms = Minesweeper::new(10, 1, 1);
-        let ms_empty = Minesweeper::new(1, 1, 0);
-        
-        let _debug = ms.cells();
-        
-        println!("{}", size_of::<[Cell; 10]>());
-        println!("{}", size_of::<Cell>());
+            assert_eq!(
+                ms.cells
+                    .iter()
+                    .filter(|cell| cell.value == CellValue::Mine)
+                    .count(),
+                20
+            );
+            assert_eq!(
+                ms_empty
+                    .cells
+                    .iter()
+                    .filter(|cell| cell.value == CellValue::Mine)
+                    .count(),
+                0
+            );
+        }
     }
 }
