@@ -94,20 +94,7 @@ impl Minesweeper {
         }
     }
 
-    fn get_index(&self, row: u32, column: u32) -> usize {
-        (row * self.width + column) as usize
-    }
-
-    fn get_cell(&self, row: u32, column: u32) -> Option<&Cell> {
-        self.cells.get(self.get_index(row, column))
-    }
-
-    fn get_cell_mut(&mut self, row: u32, column: u32) -> Option<&mut Cell> {
-        let idx = self.get_index(row, column);
-        self.cells.get_mut(idx)
-    }
-
-    fn count_mines(&self, row: u32, col: u32) -> u8 {
+    pub fn count_mines(&self, row: u32, col: u32) -> u8 {
         let row_min = if row > 0 { row - 1 } else { row };
         let row_max = if row >= self.width - 1 { row } else { row + 1 };
         let col_min = if col > 0 { col - 1 } else { col };
@@ -124,6 +111,19 @@ impl Minesweeper {
                 };
                 acc
             })
+    }
+
+    fn get_index(&self, row: u32, column: u32) -> usize {
+        (row * self.width + column) as usize
+    }
+
+    fn get_cell(&self, row: u32, column: u32) -> Option<&Cell> {
+        self.cells.get(self.get_index(row, column))
+    }
+
+    fn get_cell_mut(&mut self, row: u32, column: u32) -> Option<&mut Cell> {
+        let idx = self.get_index(row, column);
+        self.cells.get_mut(idx)
     }
 }
 
