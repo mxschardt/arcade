@@ -4,26 +4,28 @@ use std::collections::HashSet;
 
 use wasm_bindgen::prelude::*;
 
-#[derive(Debug)]
 #[wasm_bindgen]
+#[derive(Debug)]
 pub struct Cell {
     state: CellState,
     value: CellValue,
 }
 
-#[derive(Debug, PartialEq)]
 #[wasm_bindgen]
+#[repr(u8)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum CellValue {
-    Mine,
-    MineCount,
+    Mine = 1,
+    MineCount = 0,
 }
 
-#[derive(Debug)]
 #[wasm_bindgen]
+#[repr(u8)]
+#[derive(Debug, Clone, Copy)]
 pub enum CellState {
-    Revealed,
-    Flagged,
-    Closed,
+    Closed = 0,
+    Revealed = 2,
+    Flagged = 3,
 }
 
 #[derive(Debug)]
@@ -43,8 +45,9 @@ impl Minesweeper {
             cells: {
                 let mut cells = Vec::new();
                 let mut mines = HashSet::new();
-
-                for _ in 0..mine_count {
+                let mine_count = mine_count as usize;
+                
+                while mines.len() < mine_count {
                     let mine_pos = rand::thread_rng().gen_range(0..height * width);
                     mines.insert(mine_pos);
                 }
@@ -71,7 +74,7 @@ impl Minesweeper {
         self.to_string()
     }
 
-    pub fn cell(&self) -> *const Cell {
+    pub fn cells(&self) -> *const Cell {
         self.cells.as_ptr()
     }
 
@@ -160,7 +163,8 @@ impl fmt::Display for Minesweeper {
 
 #[cfg(test)]
 mod tests {
-    use crate::minesweeper::Minesweeper;
+    use crate::minesweeper::{ Minesweeper, Cell, CellValue };
+    use std::mem::size_of;
 
     #[test]
     fn setup() {
@@ -183,5 +187,26 @@ mod tests {
         }
         println!("{}", ms);
         println!("{:?}", ms);
+    }
+    #[test]
+    fn test_mine_count() {
+        for _ in 0..99 {
+            let ms = Minesweeper::new(20, 20, 20);
+            let ms_empty = Minesweeper::new(20, 20, 0);
+            
+            assert_eq!(ms.cells.iter().filter(|cell| cell.value == CellValue::Mine).count(), 20);
+            assert_eq!(ms_empty.cells.iter().filter(|cell| cell.value == CellValue::Mine).count(), 0);
+        }
+    }
+
+    #[test]
+    fn memory_test() {
+        let ms = Minesweeper::new(10, 1, 1);
+        let ms_empty = Minesweeper::new(1, 1, 0);
+        
+        let _debug = ms.cells();
+        
+        println!("{}", size_of::<[Cell; 10]>());
+        println!("{}", size_of::<Cell>());
     }
 }
