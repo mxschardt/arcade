@@ -44,16 +44,10 @@ impl Minesweeper {
             height,
             cells: {
                 let mut cells = Vec::new();
-                let mut mines = HashSet::new();
-                let mine_count = mine_count as usize;
+                let mines = Minesweeper::create_mine_positions(width, height, mine_count);
                 
-                while mines.len() < mine_count {
-                    let mine_pos = rand::thread_rng().gen_range(0..height * width);
-                    mines.insert(mine_pos);
-                }
-
-                for x in 0..height * width {
-                    let cell_value = if mines.contains(&x) {
+                for idx in 0..height * width {
+                    let cell_value = if mines.contains(&idx) {
                         CellValue::Mine
                     } else {
                         CellValue::MineCount
@@ -124,6 +118,17 @@ impl Minesweeper {
     fn get_cell_mut(&mut self, row: u32, column: u32) -> Option<&mut Cell> {
         let idx = self.get_index(row, column);
         self.cells.get_mut(idx)
+    }
+
+    fn create_mine_positions(width: u32, height: u32, mine_count: u32) -> HashSet<u32> {
+        let mut mines = HashSet::with_capacity(mine_count as usize);
+
+        while mines.len() < mine_count as usize {
+            let mine_pos = rand::thread_rng().gen_range(0..height * width);
+            mines.insert(mine_pos);
+        }
+
+        mines
     }
 }
 
