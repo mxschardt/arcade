@@ -46,7 +46,7 @@ impl Minesweeper {
             cells: {
                 let mut cells = Vec::new();
                 let mines = Minesweeper::create_mine_positions(width, height, mine_count);
-                
+
                 for idx in 0..height * width {
                     let cell_value = if mines.contains(&idx) {
                         CellValue::Mine
@@ -90,11 +90,12 @@ impl Minesweeper {
     }
 
     pub fn count_mines(&self, row: u32, col: u32) -> u8 {
+        // Check bounds and get Range from -1 or 0 to 1
         let row_min = if row > 0 { row - 1 } else { row };
         let row_max = if row >= self.width - 1 { row } else { row + 1 };
         let col_min = if col > 0 { col - 1 } else { col };
         let col_max = if col >= self.height - 1 { col } else { col + 1 };
-
+        // Get relative positions and count mines
         (row_min..=row_max)
             .flat_map(move |i| (col_min..=col_max).map(move |j| (i, j)))
             .filter(move |&pos| pos != (row, col))
@@ -169,8 +170,7 @@ impl fmt::Display for Minesweeper {
 
 #[cfg(test)]
 mod tests {
-    use crate::minesweeper::{Cell, CellValue, Minesweeper};
-    use std::mem::size_of;
+    use crate::minesweeper::{CellValue, Minesweeper};
 
     #[test]
     fn setup() {
@@ -218,3 +218,4 @@ mod tests {
         }
     }
 }
+
